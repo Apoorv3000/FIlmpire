@@ -4,7 +4,7 @@ module.exports = {
     browser: true,
     es6: true,
   },
-  extends: ["plugin:react/recommended", "airbnb"],
+  extends: ["plugin:react/recommended", "airbnb", "prettier"],
   globals: {
     Atomics: "readonly",
     SharedArrayBuffer: "readonly",
@@ -12,11 +12,12 @@ module.exports = {
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
+      requireConfigFile: false,
     },
     ecmaVersion: 2018,
     sourceType: "module",
   },
-  parser: "babel-eslint",
+  parser: "@babel/eslint-parser",
   plugins: ["react"],
   rules: {
     "import/extensions": 0,
@@ -25,6 +26,13 @@ module.exports = {
     "react/state-in-constructor": 0,
     "import/prefer-default-export": 0,
     "max-len": [2, 250],
+    "react/function-component-definition": [
+      2,
+      {
+        namedComponents: "arrow-function",
+        unnamedComponents: "arrow-function",
+      },
+    ],
     "no-multiple-empty-lines": [
       "error",
       {
@@ -46,6 +54,7 @@ module.exports = {
     "jsx-a11y/no-autofocus": 0,
     "jsx-a11y/no-static-element-interactions": 0,
     "react/no-array-index-key": 0,
+
     "jsx-a11y/anchor-is-valid": [
       "error",
       {

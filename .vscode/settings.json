@@ -1,0 +1,6 @@
+{
+    "prettier.jsxSingleQuote": false,
+    "prettier.singleQuote": false,
+    "reactSnippets.settings.prettierEnabled": false,
+    "prettier.trailingComma": "all"
+}

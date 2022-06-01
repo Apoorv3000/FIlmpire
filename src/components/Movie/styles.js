@@ -3,6 +3,8 @@ import { makeStyles } from "@mui/styles";
 export default makeStyles((theme) => ({
   movie: {
     padding: "10px",
+    display: "flex",
+    justifyContent: "center",
   },
   title: {
     color: theme.palette.text.primary,
@@ -30,6 +32,7 @@ export default makeStyles((theme) => ({
     borderRadius: "20px",
     height: "300px",
     marginBottom: "10px",
+    transitionDuration: "200ms",
     "&:hover": {
       transform: "scale(1.05)",
     },

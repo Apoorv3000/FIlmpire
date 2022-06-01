@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   CircularProgress,
@@ -8,9 +8,18 @@ import {
 import { useSelector } from "react-redux";
 import { useGetMoviesQuery } from "../../services/TMDB";
 import { MovieList } from "..";
+import { selectGenreOrCategory } from "../../features/currentGenreorCategory";
 
 const Movies = () => {
-  const { data, isFetching, error } = useGetMoviesQuery();
+  const [page, setPage] = useState(1);
+  const { genreIdOrCategoryName, searchQuery } = useSelector(
+    (state) => state.currentGenreorCategory,
+  );
+  const { data, isFetching, error } = useGetMoviesQuery({
+    genreIdOrCategoryName,
+    page,
+    searchQuery,
+  });
 
   if (isFetching) {
     return (

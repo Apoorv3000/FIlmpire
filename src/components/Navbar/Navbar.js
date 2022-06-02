@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   IconButton,
@@ -18,13 +18,44 @@ import { Link } from "react-router-dom";
 import { Sidebar, Search } from "..";
 import useStyles from "./styles";
 import { useTheme } from "@mui/material/styles";
+import { fetchToken, createSessionId, moviesApi } from "../../utils";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser, userSelector } from "../../features/auth";
 
 const Navbar = () => {
+  const { isAuthenticated, user } = useSelector(userSelector);
   const classes = useStyles();
   const isMobile = useMediaQuery("(max-width:600px)");
   const theme = useTheme();
-  const isAuthenticated = true;
   const [mobileOpen, setMobileOpen] = useState(false);
+  const token = localStorage.getItem("request_token");
+  const session_id = localStorage.getItem("session_id");
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const loginUser = async () => {
+      if (token) {
+        if (session_id) {
+          const { data: userData } = await moviesApi.get(
+            `/account?session_id=${session_id}`,
+          );
+          dispatch(setUser(userData));
+        } else {
+          const sessionId = await createSessionId();
+
+          const { data: userData } = await moviesApi.get(
+            `/account?session_id=${sessionId}`,
+          );
+
+          dispatch(setUser(userData));
+        }
+      }
+    };
+
+    loginUser();
+  }, [token]);
+
+  const userImg = user?.avatar?.tmdb?.avatar_path;
 
   return (
     <>
@@ -47,22 +78,22 @@ const Navbar = () => {
           {!isMobile && <Search />}
           <div>
             {!isAuthenticated ? (
-              <Button color="inherit" onClick={() => {}}>
+              <Button color="inherit" onClick={fetchToken}>
                 Login &nbsp; <AccountCircle />
               </Button>
             ) : (
               <Button
                 color="inherit"
                 LinkComponent={Link}
-                to={`/profile/:id`}
+                to={`/profile/${user.id}`}
                 className={classes.linkButton}
                 onClick={() => {}}
               >
                 {!isMobile && <>My Movies &nbsp;</>}
-                <Avatar
+                <img
                   style={{ width: 30, height: 30 }}
-                  alt="Profile"
-                  src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
+                  alt={user.username}
+                  src={`https://www.themoviedb.org/t/p/w32_and_h32_face/${userImg}`}
                 />
               </Button>
             )}

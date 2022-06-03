@@ -33,6 +33,7 @@ export default makeStyles((theme) => ({
     height: "300px",
     marginBottom: "10px",
     transitionDuration: "200ms",
+    boxShadow: ".3rem 0.2rem 0.3rem rgba(0,0,0,.5)",
     "&:hover": {
       transform: "scale(1.05)",
     },

@@ -12,18 +12,18 @@ export default makeStyles((theme) => ({
   },
   poster: {
     borderRadius: "20px",
-    boxShadow: "0.5em 1em 1em rgb(64,64,70)",
-    width: "80%",
+    boxShadow: "0.5em 1em 1em rgb(64, 64, 70)",
+    width: "100%",
     [theme.breakpoints.down("md")]: {
       margin: "0 auto",
       width: "50%",
-      height: "300px",
+      // height: '350px',
     },
     [theme.breakpoints.down("sm")]: {
       margin: "0 auto",
       width: "100%",
       height: "300px",
-      marginBottom: "10px",
+      marginBottom: "30px",
     },
   },
   genresContainer: {
@@ -41,7 +41,7 @@ export default makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     textDecoration: "none",
-    [theme.breakpoints.down("md")]: {
+    [theme.breakpoints.down("sm")]: {
       padding: "0.5rem 1rem",
     },
   },
@@ -56,7 +56,7 @@ export default makeStyles((theme) => ({
     display: "flex",
     justifyContent: "space-between",
     width: "100%",
-    [theme.breakpoints.down("md")]: {
+    [theme.breakpoints.down("sm")]: {
       flexDirection: "column",
     },
   },
@@ -66,9 +66,9 @@ export default makeStyles((theme) => ({
     justifyContent: "center",
   },
   videos: {
-    width: "100%",
-    height: "50%",
-    [theme.breakpoints.down("md")]: {
+    width: "80%",
+    height: "100%",
+    [theme.breakpoints.down("sm")]: {
       width: "90%",
       height: "90%",
     },

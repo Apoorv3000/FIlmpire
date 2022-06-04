@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import moment from "moment";
 import {
   Modal,
   Typography,
@@ -25,37 +26,90 @@ import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import {
+  useGetListsQuery,
   useGetMovieQuery,
   useGetRecommendationQuery,
+  useGetWatchProviderQuery,
 } from "../../services/TMDB";
 import useStyles from "./styles";
 import genreIcon from "../../assets/genres";
 
 import { selectGenreOrCategory } from "../../features/currentGenreorCategory";
 import { MovieList } from "..";
+import { userSelector } from "../../features/auth";
 
 const MovieInformation = () => {
+  const { user } = useSelector(userSelector);
+  const [isMovieFavorited, setIsMovieFavorited] = useState(false);
+  const [isMovieWatchlisted, setIsMovieWatchlisted] = useState(false);
+  const [open, setOpen] = useState(false);
   const { id } = useParams();
-  const { data, isFetching, error } = useGetMovieQuery(id);
   const classes = useStyles();
   const dispatch = useDispatch();
-  console.log(data);
-  const hour = Math.trunc(data?.runtime / 60);
-  const [open, setOpen] = useState(false);
+  const { data, isFetching, error } = useGetMovieQuery(id);
+
+  const { data: favorites } = useGetListsQuery({
+    listName: "/favorite/movies",
+    accountId: user.id,
+    sessionId: localStorage.getItem("session_id"),
+    page: 1,
+  });
+
+  const { data: watchlists } = useGetListsQuery({
+    listName: "/watchlist/movies",
+    accountId: user.id,
+    sessionId: localStorage.getItem("session_id"),
+    page: 1,
+  });
 
   const { data: recommendation, isFetching: isLoading } =
     useGetRecommendationQuery({
       list: "/recommendations",
       movie_id: id,
     });
-  console.log(recommendation);
 
-  const isMovieFavorited = false;
-  const isMovieWatchlisted = false;
+  const { data: watchProvider, isFetching: isfetching } =
+    useGetWatchProviderQuery(id);
 
-  const addToFavorites = () => {};
+  const hour = Math.trunc(data?.runtime / 60);
+  const index = data?.videos.results.findIndex(
+    (element) => element.type === "Trailer" || "Teaser",
+  );
+  console.log(favorites);
 
-  const addToWatchList = () => {};
+  useEffect(() => {
+    setIsMovieFavorited(
+      !!favorites?.results?.find((movie) => movie?.id === data?.id),
+    );
+  }, [favorites, data]);
+
+  useEffect(() => {
+    setIsMovieWatchlisted(
+      !!watchlists?.results?.find((movie) => movie?.id === data?.id),
+    );
+  }, [watchlists, data]);
+
+  const addToFavorites = async () => {
+    await axios.post(
+      `https://api.tmdb.org/3/account/${user.id}/favorite?api_key=${
+        process.env.REACT_APP_TMDB_KEY
+      }&session_id=${localStorage.getItem("session_id")}`,
+      { media_type: "movie", movie_id: id, favorite: !isMovieFavorited },
+    );
+    setIsMovieFavorited((prevFavorite) => !prevFavorite);
+  };
+
+  console.log({ isMovieWatchlisted });
+
+  const addToWatchList = async () => {
+    await axios.post(
+      `https://api.tmdb.org/3/account/${user.id}/watchlist?api_key=${
+        process.env.REACT_APP_TMDB_KEY
+      }&session_id=${localStorage.getItem("session_id")}`,
+      { media_type: "movie", movie_id: id, watchlist: !isMovieWatchlisted },
+    );
+    setIsMovieWatchlisted((prevWatchlist) => !prevWatchlist);
+  };
 
   if (isFetching) {
     return (
@@ -72,10 +126,19 @@ const MovieInformation = () => {
       </Box>
     );
   }
-
+  const watchProviderData = watchProvider?.results?.US;
   return (
     <Grid container className={classes.containerSpaceAround}>
-      <Grid item sm={12} lg={4}>
+      <Grid
+        item
+        sm={12}
+        lg={4}
+        style={{
+          display: "flex",
+          marginBottom: "30px",
+          flexDirection: "column",
+        }}
+      >
         <img
           className={classes.poster}
           src={`https://image.tmdb.org/t/p/w500/${data?.poster_path}`}
@@ -101,10 +164,9 @@ const MovieInformation = () => {
             </Typography>
           </Box>
           <Typography variant="h6" align="center" gutterBottom>
-            {hour}hr and {data?.runtime % 60}min
-            {data?.spoken_languages.length > 0
-              ? `/ ${data?.spoken_languages[0].name}`
-              : ""}
+            {hour}hr and {data?.runtime % 60}min /{" "}
+            {moment(data?.release_date).format("MMM-YYYY")}
+            {` / Language: ${data?.spoken_languages[0].name}`}
           </Typography>
         </Grid>
         <Grid item className={classes.genresContainer}>
@@ -128,6 +190,30 @@ const MovieInformation = () => {
               </Typography>
             </Link>
           ))}
+        </Grid>
+        <Grid item className={classes.genresContainer}>
+          {(watchProviderData?.flatrate || watchProviderData?.buy)
+            ?.slice(0, 4)
+            ?.map((Provider, i) => (
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  marginBottom: "3px",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={`https://image.tmdb.org/t/p/w500/${Provider.logo_path}`}
+                  className={classes.genreImage}
+                  height={30}
+                  alt=""
+                />
+                <Typography color="textPrimary" variant="subtitle1" key={i}>
+                  {Provider?.provider_name}
+                </Typography>
+              </div>
+            ))}
         </Grid>
         <Typography variant="h5" gutterBottom style={{ marginTop: "10px" }}>
           Overview
@@ -258,7 +344,7 @@ const MovieInformation = () => {
             className={classes.videos}
             frameBorder="0"
             title="Trailer"
-            src={`https://www.youtube.com/embed/${data.videos.results[0].key}`}
+            src={`https://www.youtube.com/embed/${data?.videos?.results[index]?.key}`}
             allow="autoplay"
           />
         )}

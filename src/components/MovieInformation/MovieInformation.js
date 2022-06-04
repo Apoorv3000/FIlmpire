@@ -68,6 +68,8 @@ const MovieInformation = () => {
       movie_id: id,
     });
 
+  console.log(data);
+
   const { data: watchProvider, isFetching: isfetching } =
     useGetWatchProviderQuery(id);
 
@@ -75,7 +77,6 @@ const MovieInformation = () => {
   const index = data?.videos.results.findIndex(
     (element) => element.type === "Trailer" || "Teaser",
   );
-  console.log(favorites);
 
   useEffect(() => {
     setIsMovieFavorited(
@@ -94,21 +95,23 @@ const MovieInformation = () => {
       `https://api.tmdb.org/3/account/${user.id}/favorite?api_key=${
         process.env.REACT_APP_TMDB_KEY
       }&session_id=${localStorage.getItem("session_id")}`,
-      { media_type: "movie", movie_id: id, favorite: !isMovieFavorited },
+      { media_type: "movie", media_id: id, favorite: !isMovieFavorited },
     );
     setIsMovieFavorited((prevFavorite) => !prevFavorite);
   };
 
-  console.log({ isMovieWatchlisted });
-
-  const addToWatchList = async () => {
+  const addToWatchLists = async () => {
     await axios.post(
       `https://api.tmdb.org/3/account/${user.id}/watchlist?api_key=${
         process.env.REACT_APP_TMDB_KEY
       }&session_id=${localStorage.getItem("session_id")}`,
-      { media_type: "movie", movie_id: id, watchlist: !isMovieWatchlisted },
+      {
+        media_type: "movie",
+        media_id: id,
+        watchlist: !isMovieWatchlisted,
+      },
     );
-    setIsMovieWatchlisted((prevWatchlist) => !prevWatchlist);
+    setIsMovieWatchlisted((prev) => !prev);
   };
 
   if (isFetching) {
@@ -297,7 +300,7 @@ const MovieInformation = () => {
                   {isMovieFavorited ? "Unfavorite" : "Favorite"}
                 </Button>
                 <Button
-                  onClick={addToWatchList}
+                  onClick={addToWatchLists}
                   endIcon={isMovieWatchlisted ? <Remove /> : <PlusOne />}
                 >
                   Watchlist

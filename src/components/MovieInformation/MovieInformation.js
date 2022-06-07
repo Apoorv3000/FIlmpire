@@ -68,8 +68,6 @@ const MovieInformation = () => {
       movie_id: id,
     });
 
-  console.log(data);
-
   const { data: watchProvider, isFetching: isfetching } =
     useGetWatchProviderQuery(id);
 
@@ -130,6 +128,7 @@ const MovieInformation = () => {
     );
   }
   const watchProviderData = watchProvider?.results?.US;
+
   return (
     <Grid container className={classes.containerSpaceAround}>
       <Grid
@@ -195,7 +194,11 @@ const MovieInformation = () => {
           ))}
         </Grid>
         <Grid item className={classes.genresContainer}>
-          {(watchProviderData?.flatrate || watchProviderData?.buy)
+          {(
+            watchProviderData?.flatrate ||
+            watchProviderData?.buy ||
+            watchProviderData?.rent
+          )
             ?.slice(0, 4)
             ?.map((Provider, i) => (
               <div

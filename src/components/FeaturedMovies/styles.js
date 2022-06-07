@@ -5,7 +5,7 @@ export default makeStyles((theme) => ({
     marginBottom: "20px",
     display: "flex",
     justifyContent: "center",
-    height: "490px",
+    height: "610px",
     textDecoration: "none",
   },
   card: {

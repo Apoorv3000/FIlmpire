@@ -1,5 +1,5 @@
 import CssBaseline from "@mui/material/CssBaseline";
-import React from "react";
+import React, { useRef } from "react";
 
 import { Route, Switch } from "react-router-dom";
 import {
@@ -10,9 +10,15 @@ import {
   Profile,
 } from "./components";
 import useStyles from "./components/styles";
+import useAlan from "./components/Alan";
 
 const App = () => {
   const classes = useStyles();
+
+  const alanBtnContainer = useRef();
+
+  useAlan();
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -35,6 +41,7 @@ const App = () => {
           </Route>
         </Switch>
       </main>
+      <div ref={alanBtnContainer} />
     </div>
   );
 };

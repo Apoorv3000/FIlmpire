@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import { useEffect, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import alanBtn from "@alan-ai/alan-sdk-web";
@@ -9,14 +9,13 @@ import {
   selectGenreOrCategory,
 } from "../features/currentGenreorCategory";
 
-// f50134ddf29a4855d5bb33489a955ce22e956eca572e1d8b807a3e2338fdd0dc/stage
 const useAlan = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   const { setMode } = useContext(ColorModeContext);
   useEffect(() => {
     alanBtn({
-      key: "f50134ddf29a4855d5bb33489a955ce22e956eca572e1d8b807a3e2338fdd0dc/stage",
+      key: process.env.REACT_APP_ALAN_KEY,
       onCommand: ({ command, mode, genreOrCategory, genres, query }) => {
         if (command === "chooseGenre") {
           const foundGenre = genres.find(
